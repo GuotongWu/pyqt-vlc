@@ -30,7 +30,10 @@ class Ui_MediaPlayer(object):
         self.actionStream = QtWidgets.QAction(MediaPlayer)
         self.actionStream.setCheckable(False)
         self.actionStream.setObjectName("actionStream")
+        self.actionExit = QtWidgets.QAction(MediaPlayer)
+        self.actionExit.setObjectName("actionExit")
         self.menuNetWork_Stream.addAction(self.actionStream)
+        self.menuNetWork_Stream.addAction(self.actionExit)
         self.menubar.addAction(self.menuNetWork_Stream.menuAction())
 
         self.retranslateUi(MediaPlayer)
@@ -39,6 +42,8 @@ class Ui_MediaPlayer(object):
     def retranslateUi(self, MediaPlayer):
         _translate = QtCore.QCoreApplication.translate
         MediaPlayer.setWindowTitle(_translate("MediaPlayer", "MainWindow"))
-        self.menuNetWork_Stream.setTitle(_translate("MediaPlayer", "Open"))
-        self.actionStream.setText(_translate("MediaPlayer", "Stream"))
+        self.menuNetWork_Stream.setTitle(_translate("MediaPlayer", "Menu"))
+        self.actionStream.setText(_translate("MediaPlayer", "Open"))
         self.actionStream.setShortcut(_translate("MediaPlayer", "Ctrl+O"))
+        self.actionExit.setText(_translate("MediaPlayer", "Exit"))
+        self.actionExit.setShortcut(_translate("MediaPlayer", "Ctrl+W"))

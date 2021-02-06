@@ -16,6 +16,7 @@ class PlayMedier:
     def loadMainWin(self):
         self.viewMain = MainWin()
         self.viewMain.actionStream.triggered.connect(self.openInputURLwin)
+        self.viewMain.actionExit.triggered.connect(self.viewMain.close)
         self.viewMain.show()
 
     def loadinputURLwin(self):

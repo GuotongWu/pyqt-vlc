@@ -14,7 +14,11 @@ class InputURLwin(QWidget, Ui_InputURL):
         # self.setAttribute(Qt.WA_TranslucentBackground)
         # 设置无边框样式
         self.setWindowFlags(Qt.FramelessWindowHint)
+        # 设置cancel键响应
         self.buttonBox.rejected.connect(self.closeInputURLwin)
+        # 设置背景颜色
+        # self.setStyleSheet('QWidget{background-color:white}')
+
 
     def closeInputURLwin(self):
         self.close()

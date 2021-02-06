@@ -18,6 +18,8 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         self.setAttribute(Qt.WA_TranslucentBackground)
         # 设置无边框样式
         self.setWindowFlags(Qt.FramelessWindowHint)
+        # 设置背景颜色
+        # self.setStyleSheet('QWidget{background-color:blue}')
 
     def mousePressEvent(self, event):
         if event.button()==Qt.LeftButton:
