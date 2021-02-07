@@ -39,6 +39,7 @@ class PlayMedier:
     def get_URL(self):
         self.url = self.viewInputURLwin.lineEdit.text()
         print(self.url)
+        self.viewMain.play_url(self.url)
         self.viewInputURLwin.close()
 
 if __name__ == '__main__':

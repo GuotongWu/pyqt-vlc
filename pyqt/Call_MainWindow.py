@@ -128,6 +128,23 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
 
         self.play_pause()
 
+    def play_url(self, url):
+        # The media player has to be 'connected' to the QFrame (otherwise the
+        # video would be displayed in it's own window). This is platform
+        # specific, so we must give the ID of the QFrame (or similar object) to
+        # vlc. Different platforms have different functions for this
+        if platform.system() == "Linux": # for Linux using the X Server
+            self.mediaplayer.set_xwindow(int(self.videoframe.winId()))
+        elif platform.system() == "Windows": # for Windows
+            self.mediaplayer.set_hwnd(int(self.videoframe.winId()))
+        elif platform.system() == "Darwin": # for MacOS
+            self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
+
+        self.mediaplayer.set_mrl(url)
+        self.mediaplayer.play()
+
+        
+
     def stop(self):
         """Stop player
         """
