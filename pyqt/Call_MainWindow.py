@@ -29,6 +29,9 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # 信号槽
         self.playButton.clicked.connect(self.play_pause)
         self.pauseButton.clicked.connect(self.play_pause)
+        self.positionslider.sliderMoved.connect(self.set_position)
+        self.positionslider.sliderPressed.connect(self.set_position)
+        self.volumeslider.valueChanged.connect(self.set_volume)
         # vlc
         self.instance = vlc.Instance()
         self.media = None
@@ -36,8 +39,12 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         self.is_paused = False
         # timer
         self.timer = QtCore.QTimer(self)
-        self.timer.setInterval(100)
+        self.timer.setInterval(10)
         self.timer.timeout.connect(self.update_ui)
+        # 鼠标
+        self.m_flag = False
+        # 声音
+        self.volumeslider.setValue(self.mediaplayer.audio_get_volume())
 
 
     def mousePressEvent(self, event):
@@ -81,8 +88,8 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # Note that the setValue function only takes values of type int,
         # so we must first convert the corresponding media position.
         
-        # media_pos = int(self.mediaplayer.get_position() * 1000)
-        # self.positionslider.setValue(media_pos)
+        media_pos = int(self.mediaplayer.get_position() * 99)
+        self.positionslider.setValue(media_pos)
 
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
@@ -143,13 +150,30 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         self.mediaplayer.set_mrl(url)
         self.mediaplayer.play()
 
-        
+    def set_position(self):
+        """Set the movie position according to the position slider.
+        """
+
+        # The vlc MediaPlayer needs a float value between 0 and 1, Qt uses
+        # integer variables, so you need a factor; the higher the factor, the
+        # more precise are the results (99 should suffice).
+
+        # Set the media position to where the slider was dragged
+        self.timer.stop()
+        pos = self.positionslider.value()
+        self.mediaplayer.set_position(pos / 99.0)
+        self.timer.start()
 
     def stop(self):
         """Stop player
         """
         self.mediaplayer.stop()
         # self.playbutton.setText("Play")
+
+    def set_volume(self, volume):
+        """Set the volume
+        """
+        self.mediaplayer.audio_set_volume(volume)
 
 if __name__ == '__main__':
     # pyqt对高分辨率屏幕调整
