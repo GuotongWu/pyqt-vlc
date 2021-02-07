@@ -1,7 +1,10 @@
 import sys
+import os
 import qdarkstyle
+import platform
+import time
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QCursor
 from PyQt5.QtWidgets import QApplication
 
@@ -10,13 +13,17 @@ from random import randint
 from Call_MainWindow import *
 from Call_inputURLwin import *
 
-
 class PlayMedier:
     """主类"""
+    def __init__(self):
+        self.loadMainWin()
+
     def loadMainWin(self):
         self.viewMain = MainWin()
-        self.viewMain.actionStream.triggered.connect(self.openInputURLwin)
+        self.viewMain.actionLocal_Video.triggered.connect(self.viewMain.open_file)
+        self.viewMain.actionStream_URL.triggered.connect(self.openInputURLwin)
         self.viewMain.actionExit.triggered.connect(self.viewMain.close)
+
         self.viewMain.show()
 
     def loadinputURLwin(self):
@@ -33,7 +40,6 @@ class PlayMedier:
         self.url = self.viewInputURLwin.lineEdit.text()
         print(self.url)
         self.viewInputURLwin.close()
-
 
 if __name__ == '__main__':
     # pyqt对高分辨率屏幕调整
