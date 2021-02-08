@@ -26,9 +26,12 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         self.setWindowFlags(Qt.FramelessWindowHint)
         # 设置背景颜色
         # self.setStyleSheet('QWidget{background-color:blue}')
-        # 信号槽
+        # 信号槽      
+        self.actionMaximize.triggered.connect(self.showMaximized)
+        self.actionMinimize.triggered.connect(self.showMinimized)
+        self.actionDefault.triggered.connect(self.showNormal)
+
         self.playButton.clicked.connect(self.play_pause)
-        self.pauseButton.clicked.connect(self.play_pause)
         self.positionslider.sliderMoved.connect(self.set_position)
         self.positionslider.sliderPressed.connect(self.set_position)
         self.volumeslider.valueChanged.connect(self.set_volume)
@@ -40,6 +43,8 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         self.is_paused = False
         self.is_urlplay = False
         self.original_valume = 0
+        self.mediaplayer.set_fullscreen(True)
+        self.fullscreenButton.clicked.connect(self.set_fscreen)
         # timer
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(10)
@@ -49,6 +54,10 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # 声音
         self.volumeslider.setValue(self.mediaplayer.audio_get_volume())      
 
+    def set_fscreen(self):
+        # self.mediaplayer.set_hwnd(0)
+        self.mediaplayer.toggle_fullscreen()
+        print(self.mediaplayer.get_fullscreen())
 
     def set_mute(self):
         volume = self.mediaplayer.audio_get_volume()
@@ -83,9 +92,10 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
     def play_pause(self):
         """Toggle play/pause status
         """
+        icon = QtGui.QIcon()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            # self.playbutton.setText("Play")
+            icon.addPixmap(QtGui.QPixmap("src\play.svg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
             self.is_paused = True
             self.timer.stop()
         else:
@@ -94,9 +104,10 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
                 return
 
             self.mediaplayer.play()
-            # self.playbutton.setText("Pause")
+            icon.addPixmap(QtGui.QPixmap("src\pause.svg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
             self.timer.start()
             self.is_paused = False
+        self.playButton.setIcon(icon)
 
     def update_ui(self):
         """Updates the user interface"""
