@@ -56,9 +56,11 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         if volume == 0: # 如果当前是静音
             self.mediaplayer.audio_set_volume(self.original_valume)
             icon.addPixmap(QtGui.QPixmap("src\sound.svg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+            self.volumeslider.setValue(self.original_valume)
         else: # 如果当前有声音
             self.original_valume = self.mediaplayer.audio_get_volume()
             self.mediaplayer.audio_set_volume(0)
+            self.volumeslider.setValue(0)
             icon.addPixmap(QtGui.QPixmap("src\mute.svg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.soundButton.setIcon(icon)
 
@@ -117,6 +119,8 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
                 if not self.is_paused:
                     self.stop()
 
+        self.timelabel.setText(self.calculate_time())
+
     def open_file(self):
         """Open a media file in a MediaPlayer
         """
@@ -165,6 +169,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
 
         self.mediaplayer.set_mrl(url)
         self.is_urlplay = True
+        self.timer.start()
         self.mediaplayer.play()
 
     def set_position(self):
@@ -192,6 +197,36 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         """Set the volume
         """
         self.mediaplayer.audio_set_volume(volume)
+
+    def calculate_time(self):
+        """
+        calculate the current time
+        , return like 11:11/140:02
+        """
+        timestring = '00:00/00:00'
+        if self.mediaplayer.get_length() == -1:
+            return timestring
+        curr_msec = int(self.mediaplayer.get_length() * self.mediaplayer.get_position())
+        curr_minute = 0
+        curr_second = 0
+        if curr_msec != 0:    
+            curr_minute = curr_msec // (60 * 1000)
+            curr_second = (curr_msec - (curr_minute * 60000)) // 1000
+        if self.is_urlplay == False:
+            vi_msec = self.mediaplayer.get_length()
+            if vi_msec != 0:
+                vi_minute = vi_msec // (60 * 1000)
+                vi_second = (vi_msec - (vi_minute * 60000)) // 1000
+                timestring = str_time(curr_minute) + ':' + str_time(curr_second) + '/' + str_time(vi_minute) + ':' + str_time(vi_second)
+        else:
+            timestring =  '/00:00' + str_time(curr_minute) + ':' + str_time(curr_second)
+        return timestring 
+
+def str_time(time):
+    if time < 10:
+        return '0' + str(time)
+    else:
+        return(str(time))
 
 if __name__ == '__main__':
     # pyqt对高分辨率屏幕调整

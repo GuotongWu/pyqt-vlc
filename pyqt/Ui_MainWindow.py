@@ -57,9 +57,9 @@ class Ui_MediaPlayer(object):
         self.positionslider.setOrientation(QtCore.Qt.Horizontal)
         self.positionslider.setObjectName("positionslider")
         self.horizontalLayout_2.addWidget(self.positionslider)
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setObjectName("label")
-        self.horizontalLayout_2.addWidget(self.label)
+        self.timelabel = QtWidgets.QLabel(self.centralwidget)
+        self.timelabel.setObjectName("timelabel")
+        self.horizontalLayout_2.addWidget(self.timelabel)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -157,7 +157,7 @@ class Ui_MediaPlayer(object):
     def retranslateUi(self, MediaPlayer):
         _translate = QtCore.QCoreApplication.translate
         MediaPlayer.setWindowTitle(_translate("MediaPlayer", "MainWindow"))
-        self.label.setText(_translate("MediaPlayer", "00:00/00:00"))
+        self.timelabel.setText(_translate("MediaPlayer", "00:00/00:00"))
         self.playButton.setText(_translate("MediaPlayer", "Play"))
         self.pauseButton.setText(_translate("MediaPlayer", "Pause"))
         self.menuNetWork_Stream.setTitle(_translate("MediaPlayer", "Open"))
