@@ -32,11 +32,14 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         self.positionslider.sliderMoved.connect(self.set_position)
         self.positionslider.sliderPressed.connect(self.set_position)
         self.volumeslider.valueChanged.connect(self.set_volume)
+        self.soundButton.clicked.connect(self.set_mute)
         # vlc
         self.instance = vlc.Instance()
         self.media = None
         self.mediaplayer = self.instance.media_player_new()
         self.is_paused = False
+        self.is_urlplay = False
+        self.original_valume = 0
         # timer
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(10)
@@ -44,8 +47,20 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # 鼠标
         self.m_flag = False
         # 声音
-        self.volumeslider.setValue(self.mediaplayer.audio_get_volume())
+        self.volumeslider.setValue(self.mediaplayer.audio_get_volume())      
 
+
+    def set_mute(self):
+        volume = self.mediaplayer.audio_get_volume()
+        icon = QtGui.QIcon()
+        if volume == 0: # 如果当前是静音
+            self.mediaplayer.audio_set_volume(self.original_valume)
+            icon.addPixmap(QtGui.QPixmap("src\sound.svg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        else: # 如果当前有声音
+            self.original_valume = self.mediaplayer.audio_get_volume()
+            self.mediaplayer.audio_set_volume(0)
+            icon.addPixmap(QtGui.QPixmap("src\mute.svg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        self.soundButton.setIcon(icon)
 
     def mousePressEvent(self, event):
         if event.button()==Qt.LeftButton:
@@ -88,18 +103,19 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # Note that the setValue function only takes values of type int,
         # so we must first convert the corresponding media position.
         
-        media_pos = int(self.mediaplayer.get_position() * 99)
-        self.positionslider.setValue(media_pos)
+        if self.is_urlplay == False:
+            media_pos = int(self.mediaplayer.get_position() * 99)
+            self.positionslider.setValue(media_pos)
 
-        # No need to call this function if nothing is played
-        if not self.mediaplayer.is_playing():
-            self.timer.stop()
+            # No need to call this function if nothing is played
+            if not self.mediaplayer.is_playing():
+                self.timer.stop()
 
-            # After the video finished, the play button stills shows "Pause",
-            # which is not the desired behavior of a media player.
-            # This fixes that "bug".
-            if not self.is_paused:
-                self.stop()
+                # After the video finished, the play button stills shows "Pause",
+                # which is not the desired behavior of a media player.
+                # This fixes that "bug".
+                if not self.is_paused:
+                    self.stop()
 
     def open_file(self):
         """Open a media file in a MediaPlayer
@@ -148,6 +164,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
             self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
 
         self.mediaplayer.set_mrl(url)
+        self.is_urlplay = True
         self.mediaplayer.play()
 
     def set_position(self):
@@ -159,10 +176,11 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # more precise are the results (99 should suffice).
 
         # Set the media position to where the slider was dragged
-        self.timer.stop()
-        pos = self.positionslider.value()
-        self.mediaplayer.set_position(pos / 99.0)
-        self.timer.start()
+        if self.is_urlplay == False:
+            self.timer.stop()
+            pos = self.positionslider.value()
+            self.mediaplayer.set_position(pos / 99.0)
+            self.timer.start()
 
     def stop(self):
         """Stop player
