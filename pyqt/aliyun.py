@@ -5,8 +5,8 @@ import json
 
 class Aliyun:
     def __init__(self):
-        AK = 'LTAI4GKEe5P4547RSdYEvQ9C'
-        Secret = 'iabcuTObZx6SZnYfHoazF0O8carcTv'
+        AK = 'XXXXXXXXXXXXXXXXX'
+        Secret = 'XXXXXXXXXXXXXXXXXXXXXXXX'
         self.clt = client.AcsClient(AK, Secret, 'cn-shenzhen')
     def describeLiveStreamBitRateDataRequest(self):
         request = DescribeLiveStreamBitRateDataRequest.DescribeLiveStreamBitRateDataRequest()
