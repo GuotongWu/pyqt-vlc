@@ -54,6 +54,9 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # 声音
         self.volumeslider.setValue(self.mediaplayer.audio_get_volume())      
 
+    def getfps(self):
+        return self.mediaplayer.get_state()
+
     def set_fscreen(self):
         # self.mediaplayer.set_hwnd(0)
         self.mediaplayer.toggle_fullscreen()
@@ -131,6 +134,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
                     self.stop()
 
         self.timelabel.setText(self.calculate_time())
+        print(self.getfps())
 
     def open_file(self):
         """Open a media file in a MediaPlayer
@@ -217,7 +221,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         timestring = '00:00/00:00'
         if self.mediaplayer.get_length() == -1:
             return timestring
-        curr_msec = int(self.mediaplayer.get_length() * self.mediaplayer.get_position())
+        curr_msec = int(self.mediaplayer.get_time())
         curr_minute = 0
         curr_second = 0
         if curr_msec != 0:    
@@ -230,7 +234,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
                 vi_second = (vi_msec - (vi_minute * 60000)) // 1000
                 timestring = str_time(curr_minute) + ':' + str_time(curr_second) + '/' + str_time(vi_minute) + ':' + str_time(vi_second)
         else:
-            timestring =  '/00:00' + str_time(curr_minute) + ':' + str_time(curr_second)
+            timestring = str_time(curr_minute) + ':' + str_time(curr_second) + '/00:00'
         return timestring 
 
 def str_time(time):
