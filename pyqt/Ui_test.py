@@ -24,7 +24,7 @@ class Ui_Form(object):
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 249, 259))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
-        self.graphicsView = PlotWidget(self.scrollAreaWidgetContents)
+        self.graphicsView = PlotWidget(self.scrollAreaWidgetContents, axisItems = {'bottom': pg.DateAxisItem()})
         self.graphicsView.setGeometry(QtCore.QRect(0, 30, 221, 171))
         self.graphicsView.setObjectName("graphicsView")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
@@ -36,3 +36,4 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
 from pyqtgraph import PlotWidget
+import pyqtgraph as pg
