@@ -1,6 +1,13 @@
 {
- "RequestId": "7C9A4A81-2E1D-48D7-9721-78AF7E3A2D69",
+ "RequestId": "67460CED-A614-4692-959D-62CFBBFE912D",
  "FrameRateAndBitRateInfos": {
-  "FrameRateAndBitRateInfo": []
+  "FrameRateAndBitRateInfo": [
+   {
+    "VideoFrameRate": 23.96,
+    "AudioFrameRate": 43.05,
+    "BitRate": 333943.18,
+    "StreamUrl": "rtmp://pushstream.omysycamore.top/apptransvideo/streamtransvideo"
+   }
+  ]
  }
 }
