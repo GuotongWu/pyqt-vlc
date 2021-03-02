@@ -174,7 +174,7 @@ class Ui_MediaPlayer(object):
         self.label_bit = QtWidgets.QLabel(self.frame)
         self.label_bit.setObjectName("label_bit")
         self.verticalLayout_4.addWidget(self.label_bit)
-        self.widget = MatplotlibWidge(self.frame)
+        self.widget = MatplotlibWidget(self.frame)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -182,7 +182,7 @@ class Ui_MediaPlayer(object):
         self.widget.setSizePolicy(sizePolicy)
         self.widget.setObjectName("widget")
         self.verticalLayout_4.addWidget(self.widget)
-        self.widget_2 = MatplotlibWidge(self.frame)
+        self.widget_2 = MatplotlibWidget(self.frame)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -256,4 +256,4 @@ class Ui_MediaPlayer(object):
         self.actionDefault.setShortcut(_translate("MediaPlayer", "Alt+Q"))
         self.actionExit.setText(_translate("MediaPlayer", "Exit"))
         self.actionExit.setShortcut(_translate("MediaPlayer", "Ctrl+W"))
-from MatplotlibWidge import MatplotlibWidge
+from MatplotlibWidget import MatplotlibWidget

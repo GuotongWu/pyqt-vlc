@@ -55,7 +55,10 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # 声音
         self.volumeslider.setValue(self.mediaplayer.audio_get_volume())   
         # 监控
-        self.monitor = Monitor()   
+        self.monitor = Monitor()
+        # 绘图
+        # self.widget.setVisible(False)
+        # self.widget_2.setVisible(False)
 
     def getfps(self):
         return self.mediaplayer.get_fps()

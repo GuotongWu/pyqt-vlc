@@ -1,7 +1,6 @@
 hello.py
 .vscode
 vlc-3.0.11
-*.ui
 player.py
 pyqt5vlc.py
 __pycache__
