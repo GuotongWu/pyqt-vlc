@@ -48,7 +48,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # self.fullscreenButton.clicked.connect(self.set_fscreen)
         # timer
         self.timer = QtCore.QTimer(self)
-        self.timer.setInterval(10)  # 设置更新时间为10ms
+        self.timer.setInterval(100)  # 设置更新时间为100ms
         self.timer.timeout.connect(self.update_ui)
         self.cnt = 0
         # 鼠标

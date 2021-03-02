@@ -11,6 +11,10 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
+from Monitor import Monitor
+import pandas as pd
+import numpy as np
+import matplotlib.dates as mdates
 
 class MyMplCanvas(FigureCanvas):
     """FigureCanvas的最终的父类其实是QWidget。"""
@@ -20,11 +24,15 @@ class MyMplCanvas(FigureCanvas):
         # 配置中文显示
         plt.rcParams['font.family'] = ['SimHei']  # 用来正常显示中文标签
         plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
-        # plt.rcParams['toolbar'] = 'None' 
+        self.monitor = Monitor()
 
-        self.fig = Figure(figsize=(width,height),dpi=dpi)  # 新建一个figure
+        self.fig = Figure(figsize=(width,height),dpi=dpi, tight_layout=True)  # 新建一个figure
         # self.fig.canvas.window().statusBar().setVisible(False) # Remove status bar (bottom bar)
-        self.axes = self.fig.add_subplot(111)  # 建立一个子图，如果要建立复合图，可以在这里修改
+        self.axes_fps = self.fig.add_subplot(211)  # 建立一个子图，如果要建立复合图，可以在这里修改
+        self.axes_bps = self.fig.add_subplot(212)
+
+        self.data = [[], [], [], []]
+        self.xfmt = mdates.DateFormatter('%H:%M:%S')
 
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
@@ -35,41 +43,60 @@ class MyMplCanvas(FigureCanvas):
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
-        # try:
-        #     win = self.fig.canvas.manager.window
-        # except AttributeError:
-        #     win = self.fig.canvas.window()
-        #     toolbar = win.findChild(QtWidgets.QToolBar)
-        #     toolbar.setVisible(False)
-
     '''绘制静态图，可以在这里定义自己的绘图逻辑'''
 
     def start_static_plot(self):
-        self.fig.suptitle('测试图')
+        # self.fig.suptitle('测试图')
         t = arange(0.0, 3.0, 0.01)
         s = [1]*len(t)
-        self.axes.plot(t, s)
-        self.axes.set_ylabel('帧率/码率')
-        self.axes.set_xlabel('时间')
-        self.axes.grid(True)
+        self.axes_fps.plot(t, s)
+        self.axes_fps.set_ylabel('帧率/码率')
+        self.axes_fps.set_xlabel('时间')
+        self.axes_fps.grid(True)
 
     '''启动绘制动态图'''
 
     def start_dynamic_plot(self, *args, **kwargs):
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_figure)  # 每隔一段时间就会触发一次update_figure函数。
-        timer.start(1000)  # 触发的时间间隔为1秒。
+        timer.start(100)  # 触发的时间间隔为0.1秒。
 
     '''动态图的绘图逻辑可以在这里修改'''
 
     def update_figure(self):
-        self.axes.clear()
-        self.fig.suptitle('测试动态图')
-        l = [random.randint(0, 10) for i in range(4)]
-        self.axes.plot([0, 1, 2, 3], l, 'r')
-        self.axes.set_ylabel('动态图：Y轴')
-        self.axes.set_xlabel('动态图：X轴')
-        self.axes.grid(True)
+
+        tmp = self.monitor.getData()
+        if tmp:
+            if len(self.data[0]) < 10:
+                for i in range(0,4):
+                    self.data[i].append(tmp[i])
+                return
+            else:
+                for i in range(0,4):
+                    del self.data[i][0]
+                    self.data[i].append(tmp[i])
+        else:
+            return
+        print(self.data[1])
+
+        self.axes_fps.clear()
+        self.axes_bps.clear()
+
+        # self.axes_fps.xaxis.set_major_formatter(self.xfmt)
+        self.axes_fps.plot(self.data[0], self.data[1], 'r')
+        self.axes_fps.plot(self.data[0], self.data[2], 'g')
+        self.axes_fps.set_title('帧率变化图')
+        self.axes_fps.set_ylabel('帧率（fps）')
+        self.axes_fps.grid(True)
+
+
+        self.axes_bps.plot(self.data[0], self.data[3], 'r')
+        # self.axes_bps.xaxis.set_major_formatter(self.xfmt)
+        self.axes_bps.set_title('码率变化图')
+        self.axes_bps.set_ylabel('码率（bps）')
+        self.axes_bps.set_xlabel('时间（time）')
+        self.axes_bps.grid(True)
+        
         self.draw()
 
 
