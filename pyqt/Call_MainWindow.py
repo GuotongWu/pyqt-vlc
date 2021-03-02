@@ -141,11 +141,12 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
             data = self.monitor.getData()
             if data:
                 [time, audio, video, bit, rtmp] = data
+                time = time.strftime('%Y-%m-%dT%H:%M:%SZ')
                 self.label_time.setText('时间：' + time)
-                self.label_rtmp.setText('rtmp域名：' + rtmp)
-                self.label_audio.setText('音频帧率：' + audio)
-                self.label_video.setText('视频帧率：' + video)
-                self.label_bit.setText('比特率：' + bit)
+                self.label_rtmp.setText('rtmp域名：' + str(rtmp))
+                self.label_audio.setText('音频帧率：' + str(audio))
+                self.label_video.setText('视频帧率：' + str(video))
+                self.label_bit.setText('比特率：' + str(bit))
                     
 
         self.timelabel.setText(self.calculate_time())
@@ -191,6 +192,9 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         self.mediaplayer.play()
         self.timer.start()
         self.is_paused = False
+
+        print(self.widget.__dict__)
+        # self.widget.begin = True
 
     def set_position(self):
         if self.is_urlplay == False:

@@ -43,14 +43,12 @@ class Monitor:
         # self.time = datetime.datetime.now() - datetime.timedelta(hours=8) # datetime类型
         str_time = self.time.strftime('%Y-%m-%dT%H:%M:%SZ')
         tmp = list(self.aliyun.describeLiveDomainFrameRateAndBitRateData(str_time).values())
-
-        self.is_playing = True
+        
+        if not tmp:
+            tmp = [0, 0, 0, '--']
         tmp.insert(0, self.time)
-        # self.df.drop(index=0, inplace=True)  # 数量达到100时先删除第一行数据
-        # self.df.reset_index()
-        self.df.loc[len(self.df)] = tmp[:4] # 删除后再插入
-        self.time += datetime.timedelta(seconds=20)
-        print(self.time)
+        self.time += datetime.timedelta(seconds=10)
+        # print(self.time)
         return tmp
 
     def plot(self):

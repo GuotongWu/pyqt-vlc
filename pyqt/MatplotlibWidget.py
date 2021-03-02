@@ -26,13 +26,14 @@ class MyMplCanvas(FigureCanvas):
         plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
         self.monitor = Monitor()
 
-        self.fig = Figure(figsize=(width,height),dpi=dpi, tight_layout=True)  # 新建一个figure
+        self.fig = Figure(figsize=(width,height),dpi=dpi, tight_layout=True, facecolor=(66/255,75/255,83/255))  # 新建一个figure
         # self.fig.canvas.window().statusBar().setVisible(False) # Remove status bar (bottom bar)
         self.axes_fps = self.fig.add_subplot(211)  # 建立一个子图，如果要建立复合图，可以在这里修改
         self.axes_bps = self.fig.add_subplot(212)
 
         self.data = [[], [], [], []]
         self.xfmt = mdates.DateFormatter('%H:%M:%S')
+        self.begin = False
 
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
@@ -64,37 +65,35 @@ class MyMplCanvas(FigureCanvas):
     '''动态图的绘图逻辑可以在这里修改'''
 
     def update_figure(self):
-
+        # if self.begin:
+        # 更新图像
         tmp = self.monitor.getData()
-        if tmp:
-            if len(self.data[0]) < 10:
-                for i in range(0,4):
-                    self.data[i].append(tmp[i])
-                return
-            else:
-                for i in range(0,4):
-                    del self.data[i][0]
-                    self.data[i].append(tmp[i])
-        else:
-            return
-        print(self.data[1])
+        for i in range(0,4):
+            self.data[i].append(tmp[i])
+        if len(self.data[0]) > 20:   # 限制数据在20个以内
+            for i in range(0,4):
+                del self.data[i][0] # 超出则删除第一个元素
+        # print(self.data[1])
 
         self.axes_fps.clear()
         self.axes_bps.clear()
 
         # self.axes_fps.xaxis.set_major_formatter(self.xfmt)
-        self.axes_fps.plot(self.data[0], self.data[1], 'r')
-        self.axes_fps.plot(self.data[0], self.data[2], 'g')
+        self.axes_fps.plot(self.data[0], self.data[1], 'g')
+        self.axes_fps.plot(self.data[0], self.data[2], 'y')
         self.axes_fps.set_title('帧率变化图')
         self.axes_fps.set_ylabel('帧率（fps）')
+        self.axes_fps.patch.set_facecolor((25/255,35/255,45/255)) # 设置 ax1 区域背景颜色
+        self.axes_fps.patch.set_alpha(0.8)
         self.axes_fps.grid(True)
 
 
-        self.axes_bps.plot(self.data[0], self.data[3], 'r')
-        # self.axes_bps.xaxis.set_major_formatter(self.xfmt)
+        self.axes_bps.plot(self.data[0], self.data[3], 'g')
         self.axes_bps.set_title('码率变化图')
         self.axes_bps.set_ylabel('码率（bps）')
         self.axes_bps.set_xlabel('时间（time）')
+        self.axes_bps.patch.set_facecolor((25/255,35/255,45/255)) # 设置 ax1 区域背景颜色
+        self.axes_bps.patch.set_alpha(0.8)
         self.axes_bps.grid(True)
         
         self.draw()
