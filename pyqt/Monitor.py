@@ -39,6 +39,7 @@ class Monitor:
     def getData(self):
         # start_time = datetime.datetime.strptime('2021-02-28T07:45:00Z','%Y-%m-%dT%H:%M:%SZ')
         # self.time = datetime.datetime.strptime('2021-02-28T07:45:00Z','%Y-%m-%dT%H:%M:%SZ')
+        self.time = datetime.datetime.now() - datetime.timedelta(hours=8) # datetime类型
         str_time = self.time.strftime('%Y-%m-%dT%H:%M:%SZ')
         tmp = list(self.aliyun.describeLiveDomainFrameRateAndBitRateData(str_time).values())
         if tmp:

@@ -48,8 +48,9 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # self.fullscreenButton.clicked.connect(self.set_fscreen)
         # timer
         self.timer = QtCore.QTimer(self)
-        self.timer.setInterval(10)
+        self.timer.setInterval(10)  # 设置更新时间为10ms
         self.timer.timeout.connect(self.update_ui)
+        self.cnt = 0
         # 鼠标
         self.m_flag = False
         # 声音
@@ -57,8 +58,8 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # 监控
         self.monitor = Monitor()
         # 绘图
-        # self.widget.setVisible(False)
-        # self.widget_2.setVisible(False)
+        # self.widget.toolbar.setVisible(False)
+        # self.widget_2.toolbar.setVisible(False)
 
     def getfps(self):
         return self.mediaplayer.get_fps()
@@ -145,6 +146,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
                 self.label_audio.setText('音频帧率：' + audio)
                 self.label_video.setText('视频帧率：' + video)
                 self.label_bit.setText('比特率：' + bit)
+                    
 
         self.timelabel.setText(self.calculate_time())
 

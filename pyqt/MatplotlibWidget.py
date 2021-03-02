@@ -3,7 +3,7 @@ import random
 import matplotlib
 
 matplotlib.use("Qt5Agg")
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QSizePolicy, QWidget
 from numpy import arange, sin, pi
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -15,17 +15,16 @@ import matplotlib.pyplot as plt
 class MyMplCanvas(FigureCanvas):
     """FigureCanvas的最终的父类其实是QWidget。"""
 
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
+    def __init__(self, parent=None, width=1, height=1, dpi=100):
 
         # 配置中文显示
         plt.rcParams['font.family'] = ['SimHei']  # 用来正常显示中文标签
         plt.rcParams['axes.unicode_minus'] = False  # 用来正常显示负号
+        # plt.rcParams['toolbar'] = 'None' 
 
-        self.fig = Figure(figsize=(width, height), dpi=dpi)  # 新建一个figure
+        self.fig = Figure(figsize=(width,height),dpi=dpi)  # 新建一个figure
+        # self.fig.canvas.window().statusBar().setVisible(False) # Remove status bar (bottom bar)
         self.axes = self.fig.add_subplot(111)  # 建立一个子图，如果要建立复合图，可以在这里修改
-
-        # self.axes.hold(False)  # 每次绘图的时候不保留上一次绘图的结果
-        # self.cla()
 
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
@@ -35,6 +34,13 @@ class MyMplCanvas(FigureCanvas):
                                    QSizePolicy.Expanding,
                                    QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
+
+        # try:
+        #     win = self.fig.canvas.manager.window
+        # except AttributeError:
+        #     win = self.fig.canvas.window()
+        #     toolbar = win.findChild(QtWidgets.QToolBar)
+        #     toolbar.setVisible(False)
 
     '''绘制静态图，可以在这里定义自己的绘图逻辑'''
 
@@ -57,6 +63,7 @@ class MyMplCanvas(FigureCanvas):
     '''动态图的绘图逻辑可以在这里修改'''
 
     def update_figure(self):
+        self.axes.clear()
         self.fig.suptitle('测试动态图')
         l = [random.randint(0, 10) for i in range(4)]
         self.axes.plot([0, 1, 2, 3], l, 'r')
@@ -73,9 +80,9 @@ class MatplotlibWidget(QWidget):
 
     def initUi(self):
         self.layout = QVBoxLayout(self)
-        self.mpl = MyMplCanvas(self, width=5, height=4, dpi=100)
-        self.mpl.start_static_plot() # 如果你想要初始化的时候就呈现静态图，请把这行注释去掉
-        # self.mpl.start_dynamic_plot() # 如果你想要初始化的时候就呈现动态图，请把这行注释去掉
+        self.mpl = MyMplCanvas(self)
+        # self.mpl.start_static_plot() # 如果你想要初始化的时候就呈现静态图，请把这行注释去掉
+        self.mpl.start_dynamic_plot() # 如果你想要初始化的时候就呈现动态图，请把这行注释去掉
         self.mpl_ntb = NavigationToolbar(self.mpl, self)  # 添加完整的 toolbar
 
         self.layout.addWidget(self.mpl)
