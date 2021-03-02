@@ -5,6 +5,7 @@ from PyQt5.QtGui import QCursor
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from random import randint
+from Monitor import Monitor
 
 import os
 import time
@@ -43,8 +44,8 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         self.is_paused = False
         self.is_urlplay = False
         self.original_valume = 0
-        self.mediaplayer.set_fullscreen(True)
-        self.fullscreenButton.clicked.connect(self.set_fscreen)
+        # self.mediaplayer.set_fullscreen(True)
+        # self.fullscreenButton.clicked.connect(self.set_fscreen)
         # timer
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(10)
@@ -52,15 +53,17 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # 鼠标
         self.m_flag = False
         # 声音
-        self.volumeslider.setValue(self.mediaplayer.audio_get_volume())      
+        self.volumeslider.setValue(self.mediaplayer.audio_get_volume())   
+        # 监控
+        self.monitor = Monitor()   
 
     def getfps(self):
-        return self.mediaplayer.get_state()
+        return self.mediaplayer.get_fps()
 
     def set_fscreen(self):
         # self.mediaplayer.set_hwnd(0)
         self.mediaplayer.toggle_fullscreen()
-        print(self.mediaplayer.get_fullscreen())
+        # print(self.mediaplayer.get_fullscreen())
 
     def set_mute(self):
         volume = self.mediaplayer.audio_get_volume()
@@ -93,8 +96,6 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         self.setCursor(QCursor(Qt.ArrowCursor))
         
     def play_pause(self):
-        """Toggle play/pause status
-        """
         icon = QtGui.QIcon()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
@@ -105,11 +106,11 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
             if self.mediaplayer.play() == -1:
                 self.open_file()
                 return
-
             self.mediaplayer.play()
             icon.addPixmap(QtGui.QPixmap("src\pause.svg"), QtGui.QIcon.Normal, QtGui.QIcon.On)
             self.timer.start()
             self.is_paused = False
+        
         self.playButton.setIcon(icon)
 
     def update_ui(self):
@@ -119,7 +120,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # Note that the setValue function only takes values of type int,
         # so we must first convert the corresponding media position.
         
-        if self.is_urlplay == False:
+        if self.is_urlplay == False: # 播放本地视频
             media_pos = int(self.mediaplayer.get_position() * 99)
             self.positionslider.setValue(media_pos)
 
@@ -132,9 +133,17 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
                 # This fixes that "bug".
                 if not self.is_paused:
                     self.stop()
+        else:
+            data = self.monitor.getData()
+            if data:
+                [time, audio, video, bit, rtmp] = data
+                self.label_time.setText('时间：' + time)
+                self.label_rtmp.setText('rtmp域名：' + rtmp)
+                self.label_audio.setText('音频帧率：' + audio)
+                self.label_video.setText('视频帧率：' + video)
+                self.label_bit.setText('比特率：' + bit)
 
         self.timelabel.setText(self.calculate_time())
-        print(self.getfps())
 
     def open_file(self):
         """Open a media file in a MediaPlayer
@@ -157,24 +166,11 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         # Set the title of the track as window title
         self.setWindowTitle(self.media.get_meta(0))
 
-        # The media player has to be 'connected' to the QFrame (otherwise the
-        # video would be displayed in it's own window). This is platform
-        # specific, so we must give the ID of the QFrame (or similar object) to
-        # vlc. Different platforms have different functions for this
-        if platform.system() == "Linux": # for Linux using the X Server
-            self.mediaplayer.set_xwindow(int(self.videoframe.winId()))
-        elif platform.system() == "Windows": # for Windows
-            self.mediaplayer.set_hwnd(int(self.videoframe.winId()))
-        elif platform.system() == "Darwin": # for MacOS
-            self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
+        self.set_platform()
 
         self.play_pause()
 
-    def play_url(self, url):
-        # The media player has to be 'connected' to the QFrame (otherwise the
-        # video would be displayed in it's own window). This is platform
-        # specific, so we must give the ID of the QFrame (or similar object) to
-        # vlc. Different platforms have different functions for this
+    def set_platform(self):
         if platform.system() == "Linux": # for Linux using the X Server
             self.mediaplayer.set_xwindow(int(self.videoframe.winId()))
         elif platform.system() == "Windows": # for Windows
@@ -182,20 +178,16 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         elif platform.system() == "Darwin": # for MacOS
             self.mediaplayer.set_nsobject(int(self.videoframe.winId()))
 
+    def play_url(self, url):
+        self.set_platform()
+
         self.mediaplayer.set_mrl(url)
         self.is_urlplay = True
-        self.timer.start()
         self.mediaplayer.play()
+        self.timer.start()
+        self.is_paused = False
 
     def set_position(self):
-        """Set the movie position according to the position slider.
-        """
-
-        # The vlc MediaPlayer needs a float value between 0 and 1, Qt uses
-        # integer variables, so you need a factor; the higher the factor, the
-        # more precise are the results (99 should suffice).
-
-        # Set the media position to where the slider was dragged
         if self.is_urlplay == False:
             self.timer.stop()
             pos = self.positionslider.value()
@@ -203,21 +195,12 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
             self.timer.start()
 
     def stop(self):
-        """Stop player
-        """
         self.mediaplayer.stop()
-        # self.playbutton.setText("Play")
 
     def set_volume(self, volume):
-        """Set the volume
-        """
         self.mediaplayer.audio_set_volume(volume)
 
     def calculate_time(self):
-        """
-        calculate the current time
-        , return like 11:11/140:02
-        """
         timestring = '00:00/00:00'
         if self.mediaplayer.get_length() == -1:
             return timestring
