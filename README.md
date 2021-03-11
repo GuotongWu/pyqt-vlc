@@ -6,9 +6,9 @@
 
 界面如下：
 
-![image-20210311180730469](src\image-20210311180730469.png)
+![image-20210311180730469](https://github.com/GuotongWu/pyqt-vlc/blob/main/src/img1.png)
 
-![image-20210311194145796](src\image-20210311180730469.png)
+![image-20210311194145796](https://github.com/GuotongWu/pyqt-vlc/blob/main/src/img2.png)
 
 ## 前提条件
 
