@@ -7,3 +7,4 @@ __pycache__
 pyqt/aliyun.py
 pyqt/test.ipynb
 temp*
+*.json
