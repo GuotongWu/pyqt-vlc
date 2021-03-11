@@ -37,6 +37,12 @@ sudo pip install aliyun-python-sdk-live
 sudo pip install qdarkstyle 
 ```
 
+* 安装python调用vlc的支持库
+
+```shell
+sudo pip install python-vlc
+```
+
 2. 将仓库clone到本地
 
 ```shell
