@@ -6,9 +6,9 @@
 
 界面如下：
 
-![image-20210311180730469](.\src\image-20210311180730469.png)
+![image-20210311180730469](src\image-20210311180730469.png)
 
-![image-20210311194145796](.\src\image-20210311194145796.png)
+![image-20210311194145796](src\image-20210311180730469.png)
 
 ## 前提条件
 
@@ -57,11 +57,10 @@ mkdir vlc-3.0.11
 cp libvlc.dll libvlccore.dll plugins vlc-3.0.11
 ```
 
-4. 进入pyqt目录，运行Main.py
+4. 运行Main.py
 
 ```shell
-cd pyqt
-python Main.py
+python pyqt/Main.py
 ```
 
 ## 注意
