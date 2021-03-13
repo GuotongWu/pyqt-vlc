@@ -108,11 +108,8 @@ class MatplotlibWidget(QWidget):
         self.layout = QVBoxLayout(self)
         self.mpl = MyMplCanvas(self)
         # self.mpl.start_static_plot() # 如果你想要初始化的时候就呈现静态图，请把这行注释去掉
-        self.mpl.start_dynamic_plot() # 如果你想要初始化的时候就呈现动态图，请把这行注释去掉
-        self.mpl_ntb = NavigationToolbar(self.mpl, self)  # 添加完整的 toolbar
-
+        # self.mpl.start_dynamic_plot() # 如果你想要初始化的时候就呈现动态图，请把这行注释去掉
         self.layout.addWidget(self.mpl)
-        self.layout.addWidget(self.mpl_ntb)
 
 
 if __name__ == '__main__':

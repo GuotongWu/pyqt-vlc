@@ -71,7 +71,7 @@ python pyqt/Main.py
 
 ## 注意
 
-此播放器针对于阿里云SDK，需要结合自己的AccessKey进行使用，即将下面源码中的XXXXXX修改为自己的账号和密码即可。
+1. 此播放器针对于阿里云SDK，需要结合自己的AccessKey进行使用，即将下面源码中的XXXXXX修改为自己的账号和密码即可。
 
 ```python
 # aliyun_copy.py
@@ -81,4 +81,19 @@ class Aliyun:
         Secret = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxx'
         self.clt = client.AcsClient(AK, Secret, 'cn-shenzhen')
 ```
+2. 播放前需要在适当的位置填写域名，streamName和appName，详情参见[阿里云直播文档](https://help.aliyun.com/document_detail/53272.html?spm=a2c4g.11174283.6.937.1bb2454eZusGK9)
 
+```python
+# aliyun_copy.py
+def describeLiveStreamBitRateDataRequest(self):
+    request = DescribeLiveStreamBitRateDataRequest.DescribeLiveStreamBitRateDataRequest()
+    request.set_AppName('填写appName')
+    request.set_StreamName('填写streamName')
+    request.set_DomainName('填写域名')
+    request.set_StartTime('2021-02-08T00:28:00Z')
+    request.set_EndTime('2021-02-09T10:29:00Z')
+    result = self.clt.do_action_with_exception(request)
+    x = json.loads(result)
+    with open('aliyun.json', 'w') as f:
+        json.dump(x, f, indent=1)
+```

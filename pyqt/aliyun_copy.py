@@ -12,9 +12,9 @@ class Aliyun:
 
     def describeLiveStreamBitRateDataRequest(self):
         request = DescribeLiveStreamBitRateDataRequest.DescribeLiveStreamBitRateDataRequest()
-        request.set_AppName('apptransvideo')
-        request.set_StreamName('streamtransvideo')
-        request.set_DomainName('newpullstream.omysycamore.top')
+        request.set_AppName('填写appName')
+        request.set_StreamName('填写streamName')
+        request.set_DomainName('填写域名')
         request.set_StartTime('2021-02-08T00:28:00Z')
         request.set_EndTime('2021-02-09T10:29:00Z')
         result = self.clt.do_action_with_exception(request)
@@ -24,7 +24,7 @@ class Aliyun:
     
     def describeLiveDomainFrameRateAndBitRateData(self, time='2021-02-28T07:45:00Z'):
         request = DescribeLiveDomainFrameRateAndBitRateDataRequest.DescribeLiveDomainFrameRateAndBitRateDataRequest()
-        request.set_DomainName('pushstream.omysycamore.top')
+        request.set_DomainName('填写推流域名')
         request.set_QueryTime(time)
         result = self.clt.do_action_with_exception(request)
         x = json.loads(result)

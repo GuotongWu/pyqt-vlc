@@ -138,6 +138,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
                 if not self.is_paused:
                     self.stop()
         else:
+            self.widget.mpl.start_dynamic_plot()
             data = self.monitor.getData()
             if data:
                 [time, audio, video, bit, rtmp] = data
@@ -193,7 +194,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         self.timer.start()
         self.is_paused = False
 
-        print(self.widget.__dict__)
+        # print(self.widget.__dict__)
         # self.widget.begin = True
 
     def set_position(self):

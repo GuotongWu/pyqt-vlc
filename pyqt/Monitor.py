@@ -16,9 +16,6 @@ class Monitor:
     def __init__(self):
         self.is_playing = False # 判断是否url播放模式
         self.streamUrl = ''
-        # self.time = datetime.datetime.now() - datetime.timedelta(hours=8) # datetime类型
-        self.time = datetime.datetime.strptime('2021-02-28T07:45:00Z', '%Y-%m-%dT%H:%M:%SZ')
-        # print(self.startTime)
         self.df = pd.DataFrame(columns=['Time','VideoFrameRate', 'AudioFrameRate', 'BitRate'])
         self.aliyun = Aliyun()
 
@@ -38,17 +35,13 @@ class Monitor:
         pass
 
     def getData(self):
-        # # start_time = datetime.datetime.strptime('2021-02-28T07:45:00Z','%Y-%m-%dT%H:%M:%SZ')
-        # # self.time = datetime.datetime.strptime('2021-02-28T07:45:00Z','%Y-%m-%dT%H:%M:%SZ')
-        # self.time = datetime.datetime.now() - datetime.timedelta(hours=8) # datetime类型
-        str_time = self.time.strftime('%Y-%m-%dT%H:%M:%SZ')
+        time = datetime.datetime.now() - datetime.timedelta(seconds=10) # 延时10s
+        applyTime = time - datetime.timedelta(hours=8,seconds=10) # datetime类型
+        str_time = applyTime.strftime('%Y-%m-%dT%H:%M:%SZ')
         tmp = list(self.aliyun.describeLiveDomainFrameRateAndBitRateData(str_time).values())
-        
         if not tmp:
             tmp = [0, 0, 0, '--']
-        tmp.insert(0, self.time)
-        self.time += datetime.timedelta(seconds=10)
-        # print(self.time)
+        tmp.insert(0, time)
         return tmp
 
     def plot(self):
