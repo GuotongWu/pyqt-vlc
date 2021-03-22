@@ -35,7 +35,7 @@ class Monitor:
         pass
 
     def getData(self):
-        time = datetime.datetime.now() - datetime.timedelta(seconds=10) # 延时10s
+        time = datetime.datetime.now() - datetime.timedelta(seconds=120) # 延时120s
         applyTime = time - datetime.timedelta(hours=8,seconds=10) # datetime类型
         str_time = applyTime.strftime('%Y-%m-%dT%H:%M:%SZ')
         tmp = list(self.aliyun.describeLiveDomainFrameRateAndBitRateData(str_time).values())

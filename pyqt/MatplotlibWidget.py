@@ -80,7 +80,7 @@ class MyMplCanvas(FigureCanvas):
 
         # self.axes_fps.xaxis.set_major_formatter(self.xfmt)
         self.axes_fps.plot(self.data[0], self.data[1], 'g')
-        self.axes_fps.plot(self.data[0], self.data[2], 'y')
+        # self.axes_fps.plot(self.data[0], self.data[2], 'y')
         self.axes_fps.set_title('帧率变化图')
         self.axes_fps.set_ylabel('帧率（fps）')
         self.axes_fps.patch.set_facecolor((25/255,35/255,45/255)) # 设置 ax1 区域背景颜色

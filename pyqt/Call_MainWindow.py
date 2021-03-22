@@ -6,6 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from random import randint
 from Monitor import Monitor
+from getStatus import *
 
 import os
 import time
@@ -37,6 +38,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         self.positionslider.sliderPressed.connect(self.set_position)
         self.volumeslider.valueChanged.connect(self.set_volume)
         self.soundButton.clicked.connect(self.set_mute)
+        self.getStatusButton.clicked.connect(self.setStatus)
         # vlc
         self.instance = vlc.Instance()
         self.media = None
@@ -141,12 +143,12 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
             self.widget.mpl.start_dynamic_plot()
             data = self.monitor.getData()
             if data:
-                [time, audio, video, bit, rtmp] = data
+                [time, video, audio, bit, rtmp] = data
                 time = time.strftime('%Y-%m-%dT%H:%M:%SZ')
                 self.label_time.setText('时间：' + time)
                 self.label_rtmp.setText('rtmp域名：' + str(rtmp))
-                self.label_audio.setText('音频帧率：' + str(audio))
-                self.label_video.setText('视频帧率：' + str(video))
+                self.label_audio.setText('视频帧率：' + str(audio))
+                # self.label_video.setText('音频帧率：' + str(video))
                 self.label_bit.setText('比特率：' + str(bit))
                     
 
@@ -229,6 +231,10 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
         else:
             timestring = str_time(curr_minute) + ':' + str_time(curr_second) + '/00:00'
         return timestring 
+
+    def setStatus(self):
+        time.sleep(3)
+        self.label_status.setText('状态: ' + getStatus())
 
 def str_time(time):
     if time < 10:
