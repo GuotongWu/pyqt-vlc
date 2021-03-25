@@ -147,7 +147,7 @@ class MainWin(QMainWindow, Ui_MediaPlayer):
                 time = time.strftime('%Y-%m-%dT%H:%M:%SZ')
                 self.label_time.setText('时间：' + time)
                 self.label_rtmp.setText('rtmp域名：' + str(rtmp))
-                self.label_audio.setText('视频帧率：' + str(audio))
+                self.label_audio.setText('视频帧率：' + str(video))
                 # self.label_video.setText('音频帧率：' + str(video))
                 self.label_bit.setText('比特率：' + str(bit))
                     
