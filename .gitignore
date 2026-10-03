@@ -1,10 +1,6 @@
-hello.py
-.vscode
-vlc-3.0.11
-player.py
-pyqt5vlc.py
-__pycache__
-pyqt/aliyun.py
-pyqt/test.ipynb
-temp*
-*.json
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.env
+aliyun.json

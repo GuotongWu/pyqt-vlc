@@ -1,38 +1,38 @@
-from aliyunsdkcore import client
-from aliyunsdklive.request.v20161101 import DescribeLiveDomainBpsDataRequest
-from aliyunsdklive.request.v20161101 import DescribeLiveStreamBitRateDataRequest
-from aliyunsdklive.request.v20161101 import DescribeLiveDomainFrameRateAndBitRateDataRequest
+"""Optional Aliyun client. Credentials are read only from the environment."""
 import json
+import os
+from datetime import datetime, timedelta, timezone
+
 
 class Aliyun:
     def __init__(self):
-        AK = 'xxxxxxxxxxxxxxxxxxxxxxxx'
-        Secret = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-        self.clt = client.AcsClient(AK, Secret, 'cn-shenzhen')
+        from aliyunsdkcore.client import AcsClient
+        required = ['ALIBABA_CLOUD_ACCESS_KEY_ID', 'ALIBABA_CLOUD_ACCESS_KEY_SECRET', 'ALIYUN_LIVE_DOMAIN']
+        if any(not os.environ.get(key) for key in required):
+            raise ValueError('请配置阿里云 AccessKey 和 ALIYUN_LIVE_DOMAIN')
+        self.domain = os.environ['ALIYUN_LIVE_DOMAIN']
+        self.stream = os.environ.get('ALIYUN_LIVE_STREAM', '')
+        self.app = os.environ.get('ALIYUN_LIVE_APP', '')
+        self.clt = AcsClient(os.environ[required[0]], os.environ[required[1]],
+                             os.environ.get('ALIYUN_REGION', 'cn-shenzhen'),
+                             timeout=8, connect_timeout=5, max_retry_time=0)
 
-    def describeLiveStreamBitRateDataRequest(self):
-        request = DescribeLiveStreamBitRateDataRequest.DescribeLiveStreamBitRateDataRequest()
-        request.set_AppName('填写appName')
-        request.set_StreamName('填写streamName')
-        request.set_DomainName('填写域名')
-        request.set_StartTime('2021-02-08T00:28:00Z')
-        request.set_EndTime('2021-02-09T10:29:00Z')
-        result = self.clt.do_action_with_exception(request)
-        x = json.loads(result)
-        with open('aliyun.json', 'w') as f:
-            json.dump(x, f, indent=1)
-    
-    def describeLiveDomainFrameRateAndBitRateData(self, time='2021-02-28T07:45:00Z'):
-        request = DescribeLiveDomainFrameRateAndBitRateDataRequest.DescribeLiveDomainFrameRateAndBitRateDataRequest()
-        request.set_DomainName('填写推流域名')
-        request.set_QueryTime(time)
-        result = self.clt.do_action_with_exception(request)
-        x = json.loads(result)
-        if x['FrameRateAndBitRateInfos']:
-            return x['FrameRateAndBitRateInfos']['FrameRateAndBitRateInfo'][0]
-        else:
-            return {}
-
-if __name__ == '__main__':
-    aliyun = Aliyun()
-    print(aliyun.describeLiveDomainFrameRateAndBitRateData())
+    def describeLiveDomainFrameRateAndBitRateData(self, time=None):
+        from aliyunsdklive.request.v20161101.DescribeLiveDomainFrameRateAndBitRateDataRequest import DescribeLiveDomainFrameRateAndBitRateDataRequest
+        request = DescribeLiveDomainFrameRateAndBitRateDataRequest()
+        request.set_accept_format('json')
+        request.set_DomainName(self.domain)
+        request.set_QueryTime(time or (datetime.now(timezone.utc) - timedelta(seconds=120)).strftime('%Y-%m-%dT%H:%M:%SZ'))
+        response = json.loads(self.clt.do_action_with_exception(request))
+        rows = (response.get('FrameRateAndBitRateInfos') or {}).get('FrameRateAndBitRateInfo') or []
+        from urllib.parse import urlsplit
+        for row in rows:
+            path = urlsplit(row.get('StreamUrl', '')).path.strip('/').split('/')
+            stream_name = row.get('StreamName') or (path[-1] if path else '')
+            app_name = row.get('AppName') or (path[-2] if len(path) > 1 else '')
+            if self.stream and stream_name != self.stream:
+                continue
+            if self.app and app_name != self.app:
+                continue
+            return row
+        return {}

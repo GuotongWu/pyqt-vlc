@@ -1,99 +1,65 @@
-# pyqt-vlc
+# Stream Studio · pyqt-vlc
 
-![](https://img.shields.io/github/languages/top/GuotongWu/pyqt-vlc) ![](https://img.shields.io/github/license/GuotongWu/pyqt-vlc)
+基于 PyQt5 与 libVLC 的桌面视频播放器。支持本地媒体、HTTP/HLS、RTMP、RTSP，提供可选的阿里云直播监控。
 
-这是一个使用python-vlc实现的视频播放客户端，界面使用pyqt5开发的，有本地和视频流url两种方式，可以实现对阿里云直播服务的实时监测。
+![新版界面](src/ui-preview.png)
 
-界面如下：
+## 安装与运行
 
-![image-20210311180730469](https://github.com/GuotongWu/pyqt-vlc/blob/main/src/img1.png)
+需要 Python 3.9+ 和与 Python 位数相同的 VLC 3.x。
 
-![image-20210311194145796](https://github.com/GuotongWu/pyqt-vlc/blob/main/src/img2.png)
-
-## 前提条件
-
-已安装python3
-
-## 使用步骤
-
-1. 安装必要的支持
-
-* 安装pyqt
-
-```shell
-sudo pip install pyqt
-```
-
-* 安装阿里云核心SDK和阿里云直播SDK
-
-```shell
-sudo pip install aliyun-python-sdk-core
-sudo pip install aliyun-python-sdk-live
-```
-
-* 安装针对于Qt的CSS美化工具
-
-```shell
-sudo pip install qdarkstyle 
-```
-
-* 安装python调用vlc的支持库
-
-```shell
-sudo pip install python-vlc
-```
-
-2. 将仓库clone到本地
-
-```shell
-git clone https://github.com/GuotongWu/pyqt-vlc
-```
-
-3. 安装VLC
-
-下载[VLC源码](http://download.videolan.org/pub/videolan/vlc/3.0.11/win64/vlc-3.0.11-win64.zip)，在工程文件中新建vlc-3.0.11文件夹
-
-```shell
-mkdir vlc-3.0.11
-```
-
-把下载的压缩包中的libvlc.dll、libvlccore.dll及plugins目录都放到到vlc-3.0.11文件夹里面
-
-```shell
-cp libvlc.dll libvlccore.dll plugins vlc-3.0.11
-```
-
-4. 运行Main.py
-
-```shell
+```bash
+python -m venv .venv
+# Linux / macOS
+source .venv/bin/activate
+# Windows PowerShell：.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 python pyqt/Main.py
 ```
 
-## 注意
+Linux（Debian / Ubuntu）安装原生库：`sudo apt install vlc`。Linux 视频嵌入使用 X11，Wayland 下需要 XWayland，可用 `QT_QPA_PLATFORM=xcb python pyqt/Main.py` 启动。
 
-1. 此播放器针对于阿里云SDK，需要结合自己的AccessKey进行使用，即将下面源码中的XXXXXX修改为自己的账号和密码即可。
+Windows 安装官方 VLC；若未自动发现，设置 `PYTHON_VLC_LIB_PATH` 为 libvlc.dll 的完整路径、`PYTHON_VLC_MODULE_PATH` 为 VLC 安装目录。macOS 安装 VLC.app。不要使用旧版固定的 `./vlc-3.0.11` 路径。缺少 VLC 时程序会显示启动错误。
 
-```python
-# aliyun_copy.py
-class Aliyun:
-    def __init__(self):
-        AK = 'xxxxxxxxxxxxxxxxxxxxxxxx'
-        Secret = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-        self.clt = client.AcsClient(AK, Secret, 'cn-shenzhen')
+## 操作
+
+- 打开文件或拖入本地视频；打开 URL 可播放网络媒体。
+- Space 播放/暂停，F 全屏，Esc 退出全屏，Ctrl+O 打开文件，Ctrl+L 打开 URL。
+- 可寻址媒体支持进度拖动；直播显示 LIVE，无法寻址时禁用进度条。
+- 音量和窗口位置自动保存；静音独立于音量。播放地址中的签名参数不会显示或保存。
+- 右侧趋势图显示 VLC 报告的解码帧率，每秒采样，最多保存 120 个点；它不是云端帧率。
+
+## 可选阿里云监控
+
+基础播放不需要阿里云 SDK 或账号。需要监控时安装：
+
+```bash
+pip install -r requirements-aliyun.txt
+export ALIBABA_CLOUD_ACCESS_KEY_ID='你的 AccessKey ID'
+export ALIBABA_CLOUD_ACCESS_KEY_SECRET='你的 AccessKey Secret'
+export ALIYUN_LIVE_DOMAIN='你的推流域名'
+export ALIYUN_REGION='cn-shenzhen'
+# 可选：多流时筛选目标
+export ALIYUN_LIVE_APP='app'
+export ALIYUN_LIVE_STREAM='stream'
+python pyqt/Main.py
 ```
-2. 播放前需要在适当的位置填写域名，streamName和appName，详情参见[阿里云直播文档](https://help.aliyun.com/document_detail/53272.html?spm=a2c4g.11174283.6.937.1bb2454eZusGK9)
 
-```python
-# aliyun_copy.py
-def describeLiveStreamBitRateDataRequest(self):
-    request = DescribeLiveStreamBitRateDataRequest.DescribeLiveStreamBitRateDataRequest()
-    request.set_AppName('填写appName')
-    request.set_StreamName('填写streamName')
-    request.set_DomainName('填写域名')
-    request.set_StartTime('2021-02-08T00:28:00Z')
-    request.set_EndTime('2021-02-09T10:29:00Z')
-    result = self.clt.do_action_with_exception(request)
-    x = json.loads(result)
-    with open('aliyun.json', 'w') as f:
-        json.dump(x, f, indent=1)
+以上是 bash 语法；PowerShell 使用 `$env:变量名='值'`。使用具备查询权限的 RAM 凭据。不要将密码、AccessKey 或签名直播地址写入源码、提交到仓库。
+
+勾选启用监控，每 30 秒查询一次；也可立即刷新。查询运行在单个后台线程，失败不阻塞播放，不启动重复请求。查询时间采用 UTC，取约两分钟前的数据。云端无数据时明确显示暂无数据，不伪造为 0。未设置流筛选时展示接口返回的第一条流。关闭窗口时会等待当前有限超时的查询结束后释放线程与 VLC。
+
+阿里云 API 网络访问和播放地址访问是两条独立路径。VPS 转发并非本地播放的前提，本次没有改动远程服务器。要验证转发，仍需要有效的源流、目标播放地址和云端配置；仅凭 SSH 登录信息无法验证真实直播链路。
+
+## 验证
+
+```bash
+pip install pytest
+QT_QPA_PLATFORM=offscreen python -m pytest -q
 ```
+
+回归测试覆盖 URL 校验、时间显示、取消文件选择、直播切换本地、缓冲状态、进度控制、监控配置和对话框。播放器测试使用替身隔离原生 VLC；真实播放需另行验证。
+
+旧 Qt Designer 文件保留供参考；运行界面由 `Call_MainWindow.py` 构建，原有 qdarkstyle、pandas、Matplotlib、pyqtgraph 不再是运行依赖。
+
+本次验证：21 项自动回归通过；Linux 虚拟 X11 + libVLC 3.0.23 验证播放状态、时间推进（25 fps）、暂停、跳转、恢复、停止和释放资源。虚拟显示存在 Mesa 共享内存警告，未确认实际画面与声音输出；Windows / macOS、真实阿里云 API 与公网直播尚未验证。

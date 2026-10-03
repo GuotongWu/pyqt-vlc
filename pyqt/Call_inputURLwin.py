@@ -1,37 +1,31 @@
-import sys
-import qdarkstyle
+from PyQt5 import QtWidgets
+from player_utils import validate_url
 
-from Ui_InputURL import *
-from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5 import QtCore
-from PyQt5.QtCore import Qt
 
-class InputURLwin(QWidget, Ui_InputURL):
+class InputURLwin(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setupUi(self)
-        # 设置背景透明
-        # self.setAttribute(Qt.WA_TranslucentBackground)
-        # 设置无边框样式
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        # 设置cancel键响应
-        self.buttonBox.rejected.connect(self.closeInputURLwin)
-        # 设置背景颜色
-        # self.setStyleSheet('QWidget{background-color:white}')
+        self.setWindowTitle('打开网络媒体')
+        self.setMinimumWidth(540)
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.addWidget(QtWidgets.QLabel('直播或网络视频地址'))
+        self.lineEdit = QtWidgets.QLineEdit()
+        self.lineEdit.setPlaceholderText('https://… / rtmp://… / rtsp://…')
+        self.lineEdit.setClearButtonEnabled(True)
+        layout.addWidget(self.lineEdit)
+        self.error = QtWidgets.QLabel()
+        layout.addWidget(self.error)
+        self.buttonBox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText('开始播放')
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText('取消')
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+        layout.addWidget(self.buttonBox)
 
-
-    def closeInputURLwin(self):
-        self.close()
-
-if __name__ == '__main__':
-    # pyqt对高分辨率屏幕调整
-    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
-    
-    app = QApplication(sys.argv)
-    view = InputURLwin()
-    
-    # setup stylesheet
-    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-
-    view.show()
-    sys.exit(app.exec_())
+    def accept(self):
+        try:
+            self.url = validate_url(self.lineEdit.text())
+        except ValueError as exc:
+            self.error.setText(str(exc))
+            return
+        super().accept()
